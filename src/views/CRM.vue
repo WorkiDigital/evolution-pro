@@ -55,29 +55,6 @@
           <v-icon start>mdi-view-column</v-icon>
           Pipeline
         </v-tab>
-        <v-tab value="analytics">
-          <v-icon start>mdi-chart-areaspline</v-icon>
-          Analytics
-        </v-tab>
-        <v-tab value="activities">
-          <v-icon start>mdi-calendar-check</v-icon>
-          Atividades
-          <v-chip v-if="pendingActivitiesCount > 0" size="x-small" color="error" class="ml-2">
-            {{ pendingActivitiesCount }}
-          </v-chip>
-        </v-tab>
-        <v-tab value="automations">
-          <v-icon start>mdi-robot</v-icon>
-          Automações
-        </v-tab>
-        <v-tab value="quick-replies">
-          <v-icon start>mdi-flash</v-icon>
-          Respostas Rápidas
-        </v-tab>
-        <v-tab value="campaigns">
-          <v-icon start>mdi-bullhorn</v-icon>
-          Campanhas
-        </v-tab>
       </v-tabs>
     </div>
 
@@ -174,33 +151,6 @@
             />
           </v-window-item>
 
-          <!-- Analytics Tab -->
-          <v-window-item value="analytics">
-            <AnalyticsDashboard />
-          </v-window-item>
-
-          <!-- Activities Tab -->
-          <v-window-item value="activities">
-            <ActivitiesPanel 
-              ref="activitiesPanel"
-              @go-to-lead="goToLead" 
-            />
-          </v-window-item>
-
-          <!-- Automations Tab -->
-          <v-window-item value="automations">
-            <AutomationsPanel />
-          </v-window-item>
-
-          <!-- Quick Replies Tab -->
-          <v-window-item value="quick-replies">
-            <QuickRepliesPanel />
-          </v-window-item>
-
-          <!-- Campaigns Tab -->
-          <v-window-item value="campaigns">
-            <CampaignsPanel />
-          </v-window-item>
         </v-window>
       </div>
 

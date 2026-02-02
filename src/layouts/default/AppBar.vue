@@ -75,6 +75,11 @@
       </v-menu>
 
       
+      <v-btn @click="openSettings" icon variant="text" class="action-btn-icon mr-1">
+        <v-icon>mdi-cog</v-icon>
+        <v-tooltip activator="parent" location="bottom">Configurações</v-tooltip>
+      </v-btn>
+
       <v-btn @click="toggleTheme" icon variant="text" class="action-btn-icon">
         <v-icon>mdi-{{ dark ? "white-balance-sunny" : "weather-night" }}</v-icon>
         <v-tooltip activator="parent" location="bottom">{{ dark ? 'Modo Claro' : 'Modo Escuro' }}</v-tooltip>

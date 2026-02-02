@@ -67,20 +67,9 @@
               <v-icon start>mdi-account</v-icon>
               Informações
             </v-tab>
-            <v-tab value="business">
-              <v-icon start>mdi-briefcase</v-icon>
-              Negócio
-            </v-tab>
-            <v-tab value="notes" v-if="isEditing">
-              <v-icon start>mdi-note-text</v-icon>
-              Notas
-              <v-chip v-if="lead?.notes?.length" size="x-small" class="ml-2">
-                {{ lead.notes.length }}
-              </v-chip>
-            </v-tab>
-            <v-tab value="activity" v-if="isEditing">
-              <v-icon start>mdi-history</v-icon>
-              Atividade
+            <v-tab value="whatsapp">
+              <v-icon start>mdi-whatsapp</v-icon>
+              WhatsApp
             </v-tab>
           </v-tabs>
 
@@ -156,242 +145,55 @@
               </div>
             </v-window-item>
 
-            <!-- Business Tab -->
-            <v-window-item value="business">
-              <div class="form-section">
+
+            <v-window-item value="whatsapp">
+              <div class="form-section whatsapp-connection">
                 <h3 class="section-title">
-                  <v-icon class="mr-2" size="20">mdi-chart-timeline-variant</v-icon>
-                  Informações do Negócio
+                  <v-icon class="mr-2" size="20" color="success">mdi-whatsapp</v-icon>
+                  Conexão Evolution para o Lead
                 </h3>
                 
-                <v-row>
-                  <v-col cols="12" md="6">
-                    <v-select
-                      v-model="formData.source"
-                      :items="sources"
-                      label="Origem do Lead"
-                      :rules="[rules.required]"
-                      variant="outlined"
-                      density="comfortable"
-                      prepend-inner-icon="mdi-source-branch"
-                      class="premium-input"
-                    >
-                      <template v-slot:item="{ item, props }">
-                        <v-list-item v-bind="props">
-                          <template v-slot:prepend>
-                            <v-icon :color="getSourceColor(item.value)">{{ getSourceIcon(item.value) }}</v-icon>
-                          </template>
-                        </v-list-item>
-                      </template>
-                    </v-select>
-                  </v-col>
-
-                  <v-col cols="12" md="6">
-                    <v-select
-                      v-model="formData.stage"
-                      :items="stages"
-                      item-title="name"
-                      item-value="id"
-                      label="Estágio no Pipeline"
-                      :rules="[rules.required]"
-                      variant="outlined"
-                      density="comfortable"
-                      prepend-inner-icon="mdi-flag"
-                      class="premium-input"
-                    >
-                      <template v-slot:item="{ item, props }">
-                        <v-list-item v-bind="props">
-                          <template v-slot:prepend>
-                            <div class="stage-dot" :style="{ background: getStageColor(item.raw.color) }"></div>
-                          </template>
-                        </v-list-item>
-                      </template>
-                    </v-select>
-                  </v-col>
-
-                  <v-col cols="12" md="6">
-                    <v-text-field
-                      v-model.number="formData.value"
-                      label="Valor Estimado do Negócio"
-                      type="number"
-                      variant="outlined"
-                      density="comfortable"
-                      prepend-inner-icon="mdi-currency-usd"
-                      prefix="R$"
-                      class="premium-input"
-                    ></v-text-field>
-                  </v-col>
-
-                  <v-col cols="12" md="6">
-                    <v-select
-                      v-model="formData.priority"
-                      :items="priorities"
-                      item-title="title"
-                      item-value="value"
-                      label="Prioridade"
-                      variant="outlined"
-                      density="comfortable"
-                      prepend-inner-icon="mdi-alert-circle"
-                      class="premium-input"
-                    >
-                      <template v-slot:item="{ item, props }">
-                        <v-list-item v-bind="props">
-                          <template v-slot:prepend>
-                            <v-icon :color="item.raw.color">mdi-circle</v-icon>
-                          </template>
-                        </v-list-item>
-                      </template>
-                    </v-select>
-                  </v-col>
-
-                  <v-col cols="12" md="6">
-                    <v-text-field
-                      v-model.number="formData.score"
-                      label="Score do Lead"
-                      type="number"
-                      variant="outlined"
-                      density="comfortable"
-                      prepend-inner-icon="mdi-star"
-                      suffix="/100"
-                      :rules="[rules.score]"
-                      class="premium-input"
-                    ></v-text-field>
-                  </v-col>
-
-                  <v-col cols="12" md="6">
-                    <v-text-field
-                      v-model="formData.expectedCloseDate"
-                      label="Previsão de Fechamento"
-                      type="date"
-                      variant="outlined"
-                      density="comfortable"
-                      prepend-inner-icon="mdi-calendar"
-                      class="premium-input"
-                    ></v-text-field>
-                  </v-col>
-
-                  <v-col cols="12">
-                    <v-combobox
-                      v-model="formData.tags"
-                      label="Tags"
-                      multiple
-                      chips
-                      closable-chips
-                      variant="outlined"
-                      density="comfortable"
-                      prepend-inner-icon="mdi-tag-multiple"
-                      hint="Pressione Enter para adicionar tags personalizadas"
-                      class="premium-input"
-                    >
-                      <template v-slot:chip="{ item, props }">
-                        <v-chip v-bind="props" :color="getTagColor(item)" variant="flat" size="small">
-                          {{ item }}
-                        </v-chip>
-                      </template>
-                    </v-combobox>
-                  </v-col>
-                </v-row>
-              </div>
-            </v-window-item>
-
-            <!-- Notes Tab -->
-            <v-window-item value="notes" v-if="isEditing">
-              <div class="form-section">
-                <h3 class="section-title">
-                  <v-icon class="mr-2" size="20">mdi-note-multiple</v-icon>
-                  Notas e Observações
-                </h3>
-
-                <!-- Add note -->
-                <div class="add-note-section mb-4">
-                  <v-textarea
-                    v-model="newNote"
-                    label="Adicionar nova nota..."
-                    variant="outlined"
-                    density="comfortable"
-                    rows="3"
-                    prepend-inner-icon="mdi-pencil"
-                    class="premium-input"
-                  ></v-textarea>
-                  <v-btn
-                    color="primary"
-                    variant="flat"
-                    @click="addNote"
-                    :disabled="!newNote"
-                    class="mt-2 add-note-btn"
+                <div v-if="!currentQrCode && !generatingInstance" class="text-center py-6">
+                  <v-icon size="64" color="grey-lighten-1" class="mb-4">mdi-cellphone-link</v-icon>
+                  <p class="text-subtitle-1 text-grey-darken-1 mb-4">
+                    Gere uma instância exclusiva para este lead conectar.
+                  </p>
+                  <v-btn 
+                    color="success" 
+                    variant="flat" 
+                    prepend-icon="mdi-plus-circle"
+                    @click="handleCreateLeadInstance"
+                    :loading="generatingInstance"
                   >
-                    <v-icon start>mdi-plus</v-icon>
-                    Adicionar Nota
+                    Gerar Instância Evolution
                   </v-btn>
                 </div>
 
-                <!-- Notes timeline -->
-                <div class="notes-timeline">
-                  <div
-                    v-for="note in lead?.notes || []"
-                    :key="note.id"
-                    class="note-item"
-                  >
-                    <div class="note-avatar">
-                      <v-avatar size="32" color="primary">
-                        <span class="text-white text-caption font-weight-bold">{{ getInitials(note.user) }}</span>
-                      </v-avatar>
-                    </div>
-                    <div class="note-content">
-                      <div class="note-header">
-                        <span class="note-author">{{ note.user }}</span>
-                        <span class="note-date">{{ formatDate(note.date) }}</span>
-                      </div>
-                      <p class="note-text">{{ note.text }}</p>
-                    </div>
-                  </div>
-
-                  <div v-if="!lead?.notes?.length" class="empty-notes">
-                    <v-icon size="48" color="grey">mdi-note-text-outline</v-icon>
-                    <p>Nenhuma nota registrada</p>
-                  </div>
+                <div v-else-if="generatingInstance" class="text-center py-10">
+                  <v-progress-circular indeterminate color="primary" size="64"></v-progress-circular>
+                  <p class="mt-4">Criando e conectando instância...</p>
                 </div>
-              </div>
-            </v-window-item>
 
-            <!-- Activity Tab -->
-            <v-window-item value="activity" v-if="isEditing">
-              <div class="form-section">
-                <h3 class="section-title">
-                  <v-icon class="mr-2" size="20">mdi-timeline</v-icon>
-                  Histórico de Atividades
-                </h3>
-
-                <div class="activity-timeline">
-                  <div class="activity-item">
-                    <div class="activity-icon created">
-                      <v-icon size="16">mdi-plus-circle</v-icon>
-                    </div>
-                    <div class="activity-content">
-                      <span class="activity-text">Lead criado</span>
-                      <span class="activity-date">{{ formatDate(lead?.createdAt) }}</span>
-                    </div>
+                <div v-else-if="currentQrCode" class="qr-container text-center py-4">
+                  <v-alert type="success" variant="tonal" class="mb-4 text-left">
+                    Instância <strong>{{ generatedInstanceName }}</strong> criada! <br/>
+                    Peça ao cliente para ler o QR Code abaixo.
+                  </v-alert>
+                  
+                  <div class="qr-wrapper">
+                    <img :src="currentQrCode" alt="QR Code Evolution" />
                   </div>
-
-                  <div class="activity-item">
-                    <div class="activity-icon updated">
-                      <v-icon size="16">mdi-pencil</v-icon>
-                    </div>
-                    <div class="activity-content">
-                      <span class="activity-text">Última atualização</span>
-                      <span class="activity-date">{{ formatDate(lead?.updatedAt) }}</span>
-                    </div>
-                  </div>
-
-                  <div v-if="lead?.stage === 'fechado'" class="activity-item">
-                    <div class="activity-icon closed">
-                      <v-icon size="16">mdi-check-circle</v-icon>
-                    </div>
-                    <div class="activity-content">
-                      <span class="activity-text">Negócio fechado!</span>
-                      <span class="activity-date">{{ formatCurrency(lead?.value) }}</span>
-                    </div>
-                  </div>
+                  
+                  <v-btn 
+                    variant="text" 
+                    color="primary" 
+                    prepend-icon="mdi-refresh"
+                    @click="handleCreateLeadInstance"
+                    size="small"
+                    class="mt-2"
+                  >
+                    Recarregar QR Code
+                  </v-btn>
                 </div>
               </div>
             </v-window-item>
@@ -432,6 +234,7 @@
 
 <script>
 import { useCrmStore } from '@/store/crm'
+import { useAppStore } from '@/store/app'
 
 export default {
   name: 'LeadModal',
@@ -443,7 +246,8 @@ export default {
   },
   setup() {
     const crmStore = useCrmStore()
-    return { crmStore }
+    const appStore = useAppStore()
+    return { crmStore, appStore }
   },
   data: () => ({
     dialog: false,
@@ -476,7 +280,10 @@ export default {
       required: v => !!v || 'Campo obrigatório',
       email: v => !v || /.+@.+\..+/.test(v) || 'E-mail inválido',
       score: v => !v || (v >= 0 && v <= 100) || 'Score deve ser entre 0 e 100'
-    }
+    },
+    generatingInstance: false,
+    currentQrCode: null,
+    generatedInstanceName: ''
   }),
   computed: {
     stages() {
@@ -524,6 +331,28 @@ export default {
       if (this.lead) {
         this.$emit('open-chat', this.lead)
         this.close()
+      }
+    },
+    async handleCreateLeadInstance() {
+      this.generatingInstance = true
+      this.currentQrCode = null
+      try {
+        // Use lead name specifically for the instance
+        const instanceName = this.formData.name.toLowerCase().replace(/\s+/g, '-') + '-' + Math.floor(1000 + Math.random() * 9000);
+        this.generatedInstanceName = instanceName
+        
+        const result = await this.appStore.generateLeadInstance(instanceName);
+        
+        if (result.connection && result.connection.code) {
+          // Evolution API returns base64 QR in code property usually
+          this.currentQrCode = result.connection.code;
+        } else if (result.connection && result.connection.base64) {
+             this.currentQrCode = result.connection.base64;
+        }
+      } catch (error) {
+        console.error('Failed to create lead instance:', error)
+      } finally {
+        this.generatingInstance = false
       }
     },
     resetForm() {
@@ -876,5 +705,25 @@ export default {
   padding: 0 24px;
   border-radius: 12px;
   box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+}
+.qr-wrapper {
+  background: white;
+  padding: 16px;
+  border-radius: 12px;
+  display: inline-block;
+  margin: 20px auto;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.qr-wrapper img {
+  display: block;
+  max-width: 250px;
+  height: auto;
+}
+
+.whatsapp-connection {
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 16px;
+  padding: 24px;
 }
 </style>

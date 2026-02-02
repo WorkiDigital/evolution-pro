@@ -24,24 +24,15 @@
 
           <div class="d-flex gap-3">
             <v-btn
-              color="white"
-              variant="flat"
-              class="action-btn-primary"
-              @click="addInstance"
-              :disabled="loading"
-              size="large"
-            >
-              <v-icon start>mdi-plus</v-icon>
-              Nova Instância
-            </v-btn>
-            <v-btn
-              icon
-              variant="text"
-              class="action-btn-icon"
+              color="primary"
+              variant="tonal"
+              class="action-btn-secondary"
               @click="getInstances"
               :loading="loading"
+              size="large"
             >
-              <v-icon>mdi-refresh</v-icon>
+              <v-icon start>mdi-refresh</v-icon>
+              Atualizar Lista
             </v-btn>
           </div>
         </div>

@@ -89,13 +89,8 @@ export default {
       menuItems: [
         { title: 'Dashboard', icon: 'mdi-view-dashboard', value: 'dashboard', to: { name: 'dashboard' } },
         { title: 'Funil de Vendas', icon: 'mdi-filter-variant', value: 'funnel', to: { name: 'crm', query: { section: 'funnel' } } },
-        { title: 'Tarefas', icon: 'mdi-clipboard-check', value: 'tasks', to: { name: 'crm', query: { section: 'tasks' } } },
         { title: 'Leads', icon: 'mdi-account-group', value: 'leads', to: { name: 'crm', query: { section: 'leads' } } },
         { title: 'Chat', icon: 'mdi-whatsapp', value: 'chat', to: { name: 'chat' } },
-        { title: 'Respostas Rápidas', icon: 'mdi-flash', value: 'quick-replies', to: { name: 'crm', query: { section: 'quick-replies' } } },
-        { title: 'Automações', icon: 'mdi-robot', value: 'automations', to: { name: 'crm', query: { section: 'automations' } } },
-        { title: 'Campanhas', icon: 'mdi-bullhorn', value: 'campaigns', to: { name: 'crm', query: { section: 'campaigns' } } },
-        { title: 'Analytics', icon: 'mdi-chart-line', value: 'analytics', to: { name: 'crm', query: { section: 'analytics' } } },
       ],
     };
   },

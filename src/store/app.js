@@ -138,6 +138,24 @@ export const useAppStore = defineStore('app', {
         this.connecting = false
       }
     },
+    /**
+     * Specialized action for creating instances for leads
+     * Returns instance and connection data (QR)
+     */
+    async generateLeadInstance(instanceName, options = {}) {
+      try {
+        const instanceController = (await import('@/services/instanceController')).default;
+        const result = await instanceController.createAndConnect(instanceName, options);
+
+        // Refresh instance list
+        await this.reconnect();
+
+        return result;
+      } catch (error) {
+        console.error('generateLeadInstance failed:', error);
+        throw error;
+      }
+    },
 
     setInstanceStatus(instance, status) {
       const index = this.instancesList.findIndex(
