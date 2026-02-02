@@ -280,6 +280,10 @@ export default {
 
       this.loading = true
       try {
+        if (!this.selectedInstance) {
+           console.error("Chat ou instanceName está undefined. Verifique a inicialização do chat.");
+           return;
+        }
         const response = await instanceChatController.getAll(this.selectedInstance)
         this.chats = response.data || response || []
         
