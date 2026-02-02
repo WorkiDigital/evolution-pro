@@ -1,8 +1,5 @@
 import axios from "axios";
 import { useAppStore } from "@/store/app";
-const appStore = useAppStore();
-
-appStore
 
 const http = axios.create({
   headers: {
@@ -12,45 +9,53 @@ const http = axios.create({
 
 http.interceptors.request.use(
   config => {
+    const appStore = useAppStore();
+
     // Priority: Store > Env > Default
     const envUrl = import.meta.env.VITE_EVOLUTION_API_URL;
     const envKey = import.meta.env.VITE_EVOLUTION_API_KEY;
 
     let baseUrl = appStore.connection.host || envUrl;
 
-    // Use proxy in development to avoid CORS - ALWAYS override in dev to fix connection
+    // Use proxy in development to avoid CORS
     if (import.meta.env.DEV) {
       baseUrl = '/api_proxy';
     }
 
-    // Remove trailing slash if present to avoid double slashes
+    // Ensure baseUrl is clean
     if (baseUrl && baseUrl.endsWith('/')) {
       baseUrl = baseUrl.slice(0, -1);
     }
 
     config.baseURL = baseUrl;
-    config.headers["apikey"] = appStore.connection.globalApiKey || envKey;
 
-    // find all uri variables and replace them with the value from the params object
-    // e.g. /instance/connect/:instance -> /instance/connect/instance1
-    const params = Object.entries(config.params || {});
-    if (params.length > 0) {
-      config.url = config.url.replace(/:(\w+)/g, (_, key) => {
-        const value = params.find(([k]) => k === key)?.[1];
-        if (value) {
-          delete config.params[key];
-          return value;
+    // Default Global API Key
+    let activeApiKey = appStore.connection.globalApiKey || envKey;
+
+    // Handle dynamic URL parameters like /path/:instance
+    if (config.params) {
+      const paramsCopy = { ...config.params };
+
+      // If instance is present in params, try to get specific API Key
+      if (paramsCopy.instance) {
+        const instanceApiKey = appStore.getInstanceApiKey(paramsCopy.instance);
+        if (instanceApiKey) {
+          activeApiKey = instanceApiKey;
         }
-        return _;
-      });
-
-      if (params.instance) {
-        const apikey = appStore.getInstanceApiKey(params.instance);
-        if (apikey) config.headers["apikey"] = apikey;
       }
 
+      // Perform the replacement of :key with value from params
+      config.url = config.url.replace(/:(\w+)/g, (match, key) => {
+        if (paramsCopy[key] !== undefined) {
+          const value = paramsCopy[key];
+          delete config.params[key]; // Remove from query string
+          return value;
+        }
+        return match;
+      });
     }
 
+    config.headers["apikey"] = activeApiKey;
 
     return config;
   },

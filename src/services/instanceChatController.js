@@ -1,9 +1,11 @@
-
 import http from "../http-common";
 
+// Formato padronizado para Evolution API v1/v2
 const getAll = async (instanceName) => {
   return await http
-    .get(`/chat/findChats/${instanceName}`)
+    .get("/chat/findChats/:instance", {
+      params: { instance: instanceName }
+    })
     .then((r) => r.data)
     .catch((error) => {
       throw error.response?.data || error.response || error;
@@ -12,15 +14,20 @@ const getAll = async (instanceName) => {
 
 const hasWhatsapp = async (instanceName, numbers) => {
   return await http
-    .post(`/chat/whatsappNumbers/${instanceName}`, { numbers })
+    .post("/chat/whatsappNumbers/:instance", { numbers }, {
+      params: { instance: instanceName }
+    })
     .then((r) => r.data)
     .catch((error) => {
       throw error.response?.data || error.response || error;
     });
 }
+
 const getContacts = async (instanceName, numbers) => {
   return await http
-    .post(`/chat/findContacts/${instanceName}`, { numbers })
+    .post("/chat/findContacts/:instance", { numbers }, {
+      params: { instance: instanceName }
+    })
     .then((r) => r.data)
     .catch((error) => {
       throw error.response?.data || error.response || error;
@@ -29,17 +36,18 @@ const getContacts = async (instanceName, numbers) => {
 
 const sendMessage = async (instanceName, options) => {
   return await http
-    .post(`/message/sendText/${instanceName}`, options)
+    .post("/message/sendText/:instance", options, {
+      params: { instance: instanceName }
+    })
     .then((r) => r.data)
     .catch((error) => {
       throw error.response?.data || error.response || error;
     });
-
 }
 
 export default {
-  getAll: getAll,
-  hasWhatsapp: hasWhatsapp,
-  getContacts: getContacts,
-  sendMessage: sendMessage
+  getAll,
+  hasWhatsapp,
+  getContacts,
+  sendMessage
 }
