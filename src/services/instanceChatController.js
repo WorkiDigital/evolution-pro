@@ -3,11 +3,7 @@ import http from "../http-common";
 
 const getAll = async (instanceName) => {
   return await http
-    .get("/chat/findChats/:instance", {
-      params: {
-        instance: instanceName
-      }
-    })
+    .get(`/chat/findChats/${instanceName}`)
     .then((r) => r.data)
     .catch((error) => {
       throw error.response?.data || error.response || error;
@@ -16,11 +12,7 @@ const getAll = async (instanceName) => {
 
 const hasWhatsapp = async (instanceName, numbers) => {
   return await http
-    .post("/chat/whatsappNumbers/:instance", { numbers }, {
-      params: {
-        instance: instanceName
-      }
-    })
+    .post(`/chat/whatsappNumbers/${instanceName}`, { numbers })
     .then((r) => r.data)
     .catch((error) => {
       throw error.response?.data || error.response || error;
@@ -28,11 +20,7 @@ const hasWhatsapp = async (instanceName, numbers) => {
 }
 const getContacts = async (instanceName, numbers) => {
   return await http
-    .post("/chat/findContacts/:instance", { numbers }, {
-      params: {
-        instance: instanceName
-      }
-    })
+    .post(`/chat/findContacts/${instanceName}`, { numbers })
     .then((r) => r.data)
     .catch((error) => {
       throw error.response?.data || error.response || error;
@@ -41,11 +29,7 @@ const getContacts = async (instanceName, numbers) => {
 
 const sendMessage = async (instanceName, options) => {
   return await http
-    .post("/message/sendText/:instance", options, {
-      params: {
-        instance: instanceName
-      }
-    })
+    .post(`/message/sendText/${instanceName}`, options)
     .then((r) => r.data)
     .catch((error) => {
       throw error.response?.data || error.response || error;
