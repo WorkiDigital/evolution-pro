@@ -224,8 +224,8 @@
 </template>
 
 <script>
-import { instanceChatController } from '@/services/instanceChatController'
-import { instanceController } from '@/services/instanceController'
+import instanceChatController from '@/services/instanceChatController'
+import instanceController from '@/services/instanceController'
 
 export default {
   name: 'ChatView',
@@ -249,7 +249,7 @@ export default {
       if (!this.searchQuery) return this.chats
       const query = this.searchQuery.toLowerCase()
       return this.chats.filter(chat => {
-        const name = (chat.pushName || chat.id).toLowerCase()
+        const name = (chat.pushName || chat.id || '').toLowerCase()
         return name.includes(query)
       })
     }
@@ -258,13 +258,13 @@ export default {
     async loadInstances() {
       this.loadingInstances = true
       try {
-        const response = await instanceController.getInstances()
-        this.instances = response.data || []
+        const response = await instanceController.fetchAll()
+        this.instances = response.data || response || []
         
         // Auto-select first connected instance
-        const connectedInstance = this.instances.find(i => i.state === 'open')
+        const connectedInstance = this.instances.find(i => i.status === 'open' || i.state === 'open')
         if (connectedInstance) {
-          this.selectedInstance = connectedInstance.name
+          this.selectedInstance = connectedInstance.name || connectedInstance.instance.name
           await this.loadChats()
         }
       } catch (error) {
@@ -280,8 +280,8 @@ export default {
 
       this.loading = true
       try {
-        const response = await instanceChatController.getAllChats(this.selectedInstance)
-        this.chats = response.data || []
+        const response = await instanceChatController.getAll(this.selectedInstance)
+        this.chats = response.data || response || []
         
         // Sort by last message timestamp
         this.chats.sort((a, b) => {
@@ -308,7 +308,7 @@ export default {
       this.loadingMessages = true
       try {
         // TODO: Implement getMessages endpoint
-        // For now, using mock data
+        // For now, using mock data or empty
         this.messages = []
         
         // Scroll to bottom
@@ -328,17 +328,32 @@ export default {
 
       this.sending = true
       try {
-        await instanceChatController.sendText(
+        // Prepare options exactly as expected by the controller and API
+        // Controller: sendMessage(instanceName, options)
+        // API expects options to have { number, text } inside options or params
+        
+        const number = this.selectedChat.id.split('@')[0]
+        
+        await instanceChatController.sendMessage(
           this.selectedInstance,
-          this.selectedChat.id,
-          this.messageText
+          {
+            number: number,
+            options: {
+              delay: 1200,
+              presence: "composing",
+              linkPreview: false
+            },
+            textMessage: {
+              text: this.messageText
+            }
+          }
         )
 
-        // Add message to list
+        // Add message to list locally
         this.messages.push({
           key: { id: Date.now(), fromMe: true },
           message: { conversation: this.messageText },
-          messageTimestamp: Date.now()
+          messageTimestamp: Date.now() / 1000 // timestamps usually seconds in WA
         })
 
         this.messageText = ''
