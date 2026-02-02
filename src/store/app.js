@@ -200,9 +200,25 @@ export const useAppStore = defineStore('app', {
 
         const connection = window.localStorage.getItem('connection')
         if (connection) {
-          this.connection = JSON.parse(connection || '{}')
-          this.connecting = true
-          return this.reconnect()
+          const parsed = JSON.parse(connection || '{}')
+          if (parsed.valid) {
+            this.connection = parsed
+            this.connecting = true
+            return this.reconnect()
+          }
+        }
+
+        // Fallback to Environment Variables (Vercel/Production)
+        const envHost = import.meta.env.VITE_EVOLUTION_API_URL
+        const envKey = import.meta.env.VITE_EVOLUTION_API_KEY
+
+        if (envHost && envKey) {
+          console.log('App: Connecting using Environment Variables...')
+          try {
+            await this.setConnection({ host: envHost, globalApiKey: envKey })
+          } catch (e) {
+            console.error('App: Failed to connect using Env Vars:', e)
+          }
         }
       }
     },
