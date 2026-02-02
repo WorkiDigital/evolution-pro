@@ -291,7 +291,8 @@ export default {
         })
       } catch (error) {
         console.error('Error loading chats:', error)
-        this.showSnackbar('Erro ao carregar conversas', 'error')
+        const errorMsg = error.response?.data?.message || error.message || 'Erro desconhecido'
+        this.showSnackbar(`Erro: ${errorMsg}`, 'error')
       } finally {
         this.loading = false
       }
