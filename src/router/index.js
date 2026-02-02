@@ -2,20 +2,17 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import { supabase } from '@/plugins/supabase'
 
-// import from base from vite compiler
-const BASE_URL = import.meta.env.BASE_URL
-
 const routes = [
   // Auth Route (Public)
   {
-    path: BASE_URL + 'auth',
+    path: '/auth',
     name: 'auth',
     component: () => import('@/views/Auth.vue'),
     meta: { requiresAuth: false }
   },
   // Protected Routes
   {
-    path: BASE_URL,
+    path: '/',
     component: () => import('@/layouts/default/Default.vue'),
     meta: { requiresAuth: true },
     children: [
@@ -52,7 +49,7 @@ const routes = [
   },
   // Documentation (Public)
   {
-    path: BASE_URL + 'doc',
+    path: '/doc',
     component: () => import('@/layouts/doc/Index.vue'),
     meta: { requiresAuth: false },
     children: [
@@ -76,7 +73,7 @@ const routes = [
 ]
 
 const router = createRouter({
-  history: createWebHistory(process.env.BASE_URL),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes,
 })
 
