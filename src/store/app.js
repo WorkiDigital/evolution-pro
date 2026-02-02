@@ -131,7 +131,7 @@ export const useAppStore = defineStore('app', {
         this.instancesList = response.data
       } catch (e) {
         this.connection.valid = false
-        throw e.response?.data?.response?.message || e.response || e
+        console.warn('Reconnect failed:', e)
       } finally {
         this.connecting = false
       }
@@ -192,33 +192,39 @@ export const useAppStore = defineStore('app', {
       }
     },
     async loadConnection() {
-      if (typeof window !== 'undefined') {
-        const connectionsList = window.localStorage.getItem('connectionsList')
-        if (connectionsList) {
-          this.connectionsList = JSON.parse(connectionsList || '[]')
-        }
+      if (typeof window === 'undefined') return
 
-        const connection = window.localStorage.getItem('connection')
-        if (connection) {
+      // 1. Load lists
+      const connectionsList = window.localStorage.getItem('connectionsList')
+      if (connectionsList) {
+        this.connectionsList = JSON.parse(connectionsList || '[]')
+      }
+
+      // 2. Try LocalStorage connection first
+      const connection = window.localStorage.getItem('connection')
+      if (connection) {
+        try {
           const parsed = JSON.parse(connection || '{}')
-          if (parsed.valid) {
+          if (parsed.valid && parsed.host) {
             this.connection = parsed
             this.connecting = true
-            return this.reconnect()
+            await this.reconnect()
+            if (this.connection.valid) return
           }
+        } catch (e) {
+          console.error('Failed to load local connection:', e)
         }
+      }
 
-        // Fallback to Environment Variables (Vercel/Production)
-        const envHost = import.meta.env.VITE_EVOLUTION_API_URL
-        const envKey = import.meta.env.VITE_EVOLUTION_API_KEY
+      // 3. Fallback to Environment Variables (Vercel/Production)
+      const envHost = import.meta.env.VITE_EVOLUTION_API_URL
+      const envKey = import.meta.env.VITE_EVOLUTION_API_KEY
 
-        if (envHost && envKey) {
-          console.log('App: Connecting using Environment Variables...')
-          try {
-            await this.setConnection({ host: envHost, globalApiKey: envKey })
-          } catch (e) {
-            console.error('App: Failed to connect using Env Vars:', e)
-          }
+      if (envHost && envKey) {
+        try {
+          await this.setConnection({ host: envHost, globalApiKey: envKey })
+        } catch (e) {
+          console.warn('Auto-connection with env vars failed:', e)
         }
       }
     },
