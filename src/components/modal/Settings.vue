@@ -203,8 +203,7 @@ export default {
   },
   watch: {
     "AppStore.validConnection"(val, oldVal) {
-      if (val === oldVal) return;
-      if (!val) this.dialog = true;
+      // Auto-open disabled as connection is now handled by Env Vars
     },
   },
   computed: {

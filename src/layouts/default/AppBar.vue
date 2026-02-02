@@ -74,10 +74,6 @@
         </v-list>
       </v-menu>
 
-      <v-btn @click="openSettings" icon variant="text" class="action-btn-icon">
-        <v-icon>mdi-cog</v-icon>
-        <v-tooltip activator="parent" location="bottom">Configurações</v-tooltip>
-      </v-btn>
       
       <v-btn @click="toggleTheme" icon variant="text" class="action-btn-icon">
         <v-icon>mdi-{{ dark ? "white-balance-sunny" : "weather-night" }}</v-icon>
@@ -166,8 +162,6 @@ export default {
       this.crmStore.loadFromLocalStorage()
     } catch (e) {
       console.error(e);
-    } finally {
-      if (!this.AppStore.validConnection) this.openSettings();
     }
   },
 };

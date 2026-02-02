@@ -34,7 +34,7 @@
         class="new-connection-btn"
         @click="$router.push({ name: 'instances', query: { action: 'add' } })"
       >
-        Nova Conexão
+        Criar Instância
       </v-btn>
     </div>
 
@@ -96,7 +96,6 @@ export default {
         { title: 'Automações', icon: 'mdi-robot', value: 'automations', to: { name: 'crm', query: { section: 'automations' } } },
         { title: 'Campanhas', icon: 'mdi-bullhorn', value: 'campaigns', to: { name: 'crm', query: { section: 'campaigns' } } },
         { title: 'Analytics', icon: 'mdi-chart-line', value: 'analytics', to: { name: 'crm', query: { section: 'analytics' } } },
-        { title: 'Configurações', icon: 'mdi-cog', value: 'settings', to: { name: 'instances' } },
       ],
     };
   },
