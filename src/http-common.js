@@ -12,8 +12,19 @@ const http = axios.create({
 
 http.interceptors.request.use(
   config => {
-    config.baseURL = appStore.connection.host;
-    config.headers["apikey"] = appStore.connection.globalApiKey;
+    // Priority: Store > Env > Default
+    const envUrl = import.meta.env.VITE_EVOLUTION_API_URL;
+    const envKey = import.meta.env.VITE_EVOLUTION_API_KEY;
+
+    let baseUrl = appStore.connection.host || envUrl;
+
+    // Remove trailing slash if present to avoid double slashes
+    if (baseUrl && baseUrl.endsWith('/')) {
+      baseUrl = baseUrl.slice(0, -1);
+    }
+
+    config.baseURL = baseUrl;
+    config.headers["apikey"] = appStore.connection.globalApiKey || envKey;
 
     // find all uri variables and replace them with the value from the params object
     // e.g. /instance/connect/:instance -> /instance/connect/instance1
