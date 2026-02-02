@@ -318,7 +318,7 @@ export const useCrmStore = defineStore('crm', {
         lead_id: leadId,
         text: noteText,
         type: noteType,
-        user: 'Admin'
+        author: 'Admin'
       }]).select().single()
 
       if (!error) {
