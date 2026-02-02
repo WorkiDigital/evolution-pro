@@ -18,8 +18,8 @@ http.interceptors.request.use(
 
     let baseUrl = appStore.connection.host || envUrl;
 
-    // Use proxy in development to avoid CORS
-    if (import.meta.env.DEV && !appStore.connection.host) {
+    // Use proxy in development to avoid CORS - ALWAYS override in dev to fix connection
+    if (import.meta.env.DEV) {
       baseUrl = '/api_proxy';
     }
 
