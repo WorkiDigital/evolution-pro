@@ -52,6 +52,14 @@ export default defineConfig(({ command, mode }) => {
     },
     server: {
       port: 3000,
+      proxy: {
+        '/api_proxy': {
+          target: process.env.VITE_EVOLUTION_API_URL || 'https://painelevo.workidigital.tech',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/api_proxy/, ''),
+          secure: false,
+        }
+      }
     },
   }
 })

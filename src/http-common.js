@@ -18,6 +18,11 @@ http.interceptors.request.use(
 
     let baseUrl = appStore.connection.host || envUrl;
 
+    // Use proxy in development to avoid CORS
+    if (import.meta.env.DEV && !appStore.connection.host) {
+      baseUrl = '/api_proxy';
+    }
+
     // Remove trailing slash if present to avoid double slashes
     if (baseUrl && baseUrl.endsWith('/')) {
       baseUrl = baseUrl.slice(0, -1);
