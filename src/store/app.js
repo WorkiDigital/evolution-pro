@@ -38,36 +38,42 @@ export const useAppStore = defineStore('app', {
     async setConnection({ host, globalApiKey }) {
       try {
         this.connecting = true
+
+        // 1. Health check & version detection
         const apiResponse = await axios({
           method: 'GET',
           baseURL: host,
-          headers: {
-            'Content-Type': 'application/json',
-            'apikey': globalApiKey
-          },
+          headers: { 'apikey': globalApiKey },
           url: '/'
         })
 
-        if (!apiResponse.data || !apiResponse.data.message || !apiResponse.data.message.includes('Evolution API')) {
-          throw new Error('Essa conexão não é uma instância da evolution-api')
-        }
+        const version = apiResponse.data?.version || '1.0.0'
 
-        const { version } = apiResponse.data
-        const response = await axios({
-          method: 'GET',
-          baseURL: host,
-          headers: {
-            'Content-Type': 'application/json',
-            'apikey': globalApiKey
-          },
-          url: '/instance/fetchInstances'
-        })
+        // 2. Try Fetching Instances (v2 first, then v1 fallback)
+        let response;
+        try {
+          // Try v2 endpoint
+          response = await axios({
+            method: 'GET',
+            baseURL: host,
+            headers: { 'apikey': globalApiKey },
+            url: '/instance'
+          })
+        } catch (v2Error) {
+          // Fallback to v1 endpoint
+          response = await axios({
+            method: 'GET',
+            baseURL: host,
+            headers: { 'apikey': globalApiKey },
+            url: '/instance/fetchInstances'
+          })
+        }
 
         this.saveConnection({ host, globalApiKey, version })
         this.instancesList = response.data
       } catch (e) {
         this.connection.valid = false
-        throw e.response?.data?.response?.message || e.response || e
+        throw e.response?.data?.response?.message || e.message || e
       } finally {
         this.connecting = false
       }
@@ -79,7 +85,7 @@ export const useAppStore = defineStore('app', {
         return this.reconnect()
       } catch (e) {
         this.connection.valid = false
-        throw e.response?.data?.response?.message || e.response || e
+        throw e.response?.data?.response?.message || e.message || e
       }
     },
     async logout() {
@@ -92,7 +98,6 @@ export const useAppStore = defineStore('app', {
       this.instancesKeys = {}
       this.connectionsList = []
       this.saveLocalStorage()
-
     },
 
     async reconnect() {
@@ -100,34 +105,31 @@ export const useAppStore = defineStore('app', {
         const { host, globalApiKey } = this.connection
         if (!host || !globalApiKey) throw new Error('Invalid connection')
 
-        const apiResponse = await axios({
-          method: 'GET',
-          baseURL: host,
-          headers: {
-            'Content-Type': 'application/json',
-            'apikey': globalApiKey
-          },
-          url: '/'
-        })
+        this.connecting = true
 
-        if (!apiResponse.data || !apiResponse.data.message || !apiResponse.data.message.includes('Evolution API')) {
-          throw new Error('Essa conexão não é uma instância da evolution-api')
+        // Try v2 endpoint
+        let response;
+        try {
+          response = await axios({
+            method: 'GET',
+            baseURL: host,
+            headers: { 'apikey': globalApiKey },
+            url: '/instance'
+          })
+        } catch (v2Error) {
+          // Fallback to v1 endpoint
+          response = await axios({
+            method: 'GET',
+            baseURL: host,
+            headers: { 'apikey': globalApiKey },
+            url: '/instance/fetchInstances'
+          })
         }
 
-        const { version } = apiResponse.data
-
-        const response = await axios({
-          method: 'GET',
-          baseURL: host,
-          headers: {
-            'Content-Type': 'application/json',
-            'apikey': globalApiKey
-          },
-          url: '/instance/fetchInstances'
-        })
+        const health = await axios({ method: 'GET', baseURL: host, headers: { 'apikey': globalApiKey }, url: '/' })
+        const version = health.data?.version || this.connection.version
 
         this.saveConnection({ host, globalApiKey, version })
-
         this.instancesList = response.data
       } catch (e) {
         this.connection.valid = false

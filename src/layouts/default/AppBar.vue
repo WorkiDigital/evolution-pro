@@ -102,6 +102,14 @@ export default {
     SettingsModal,
   },
   methods: {
+    handleOnline() {
+      if (this.crmStore.showSnackbar) this.crmStore.showSnackbar('Conexão restabelecida!', 'success');
+      console.log("Conexão à internet está ativa.");
+    },
+    handleOffline() {
+      if (this.crmStore.showSnackbar) this.crmStore.showSnackbar('Sem conexão à internet!', 'error');
+      console.error("Sem conexão à internet. Verifique sua conexão e tente novamente.");
+    },
     isActiveRoute(routeName) {
       return this.$route.name === routeName
     },
@@ -163,6 +171,21 @@ export default {
     } catch (e) {
       console.error(e);
     }
+  },
+  created() {
+    // Verifique a conexão à internet conforme solicitado
+    window.addEventListener('online', this.handleOnline);
+    window.addEventListener('offline', this.handleOffline);
+    
+    if (!navigator.onLine) {
+      this.handleOffline();
+    } else {
+      console.log("Conexão à internet está ativa.");
+    }
+  },
+  beforeUnmount() {
+    window.removeEventListener('online', this.handleOnline);
+    window.removeEventListener('offline', this.handleOffline);
   },
 };
 </script>

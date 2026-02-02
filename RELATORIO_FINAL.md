@@ -50,6 +50,12 @@ Guias detalhados foram gerados para facilitar o uso e manutenção:
 - **Backend**: Supabase (PostgreSQL + Auth + Realtime)
 - **Mensageria**: Evolution API (WhatsApp)
 - **Deploy**: Configurado para Vercel (SPA Mode)
+53: 
+### 🛠️ 2. Otimizações Técnicas (Estabilidade)
+- **Monitoramento de Conexão**: Sistema proativo que detecta quedas de internet e notifica o usuário via Snackbar.
+- **Verificação de Inicialização**: Implementação de logs de segurança e verificações de integridade para objetos de Chat e Instâncias, evitando erros de `undefined`.
+- **Compatibilidade Híbrida**: Suporte automático para Evolution API v1 e v2 (endpoints `/instance` e `/instance/fetchInstances`).
+- **Carregamento Dinâmico**: Criação de utilitário para importação segura de módulos (`loader.js`).
 
 ---
 

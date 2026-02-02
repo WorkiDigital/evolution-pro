@@ -303,6 +303,12 @@ export default {
     },
 
     async selectChat(chat) {
+      // Verifique a inicialização do objeto chat conforme solicitado
+      if (chat && chat.id) {
+        console.log("Chat inicializado corretamente. id:", chat.id);
+      } else {
+        console.error("Chat ou id está undefined. Verifique a inicialização do chat.");
+      }
       this.selectedChat = chat
       await this.loadMessages()
     },
@@ -420,6 +426,12 @@ export default {
   },
 
   mounted() {
+    // Verifique a inicialização do objeto chat conforme solicitado
+    if (this.selectedInstance || this.instances.length > 0) {
+      console.log("Chat inicializado corretamente.");
+    } else {
+      console.error("Chat ou instanceName está undefined. Verifique a inicialização do chat.");
+    }
     this.loadInstances()
   }
 }
